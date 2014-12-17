@@ -44,7 +44,7 @@
     "twig"
   ],
   "dependencies": {
-    "twig": "~0.7.2",
+    "twig": "https://github.com/leroy-merlin-br/twig.js/tarball/master",
     "chalk": "~0.5.1",
     "merge": "^1.1.3"
   }
