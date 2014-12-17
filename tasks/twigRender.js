@@ -30,8 +30,7 @@ module.exports = function(grunt) {
   var Twig = require("twig"),
 
   DEFAULT_OPTIONS = {
-    extensions: [],
-    cache: false,
+    extensions: []
   };
 
   var json5 = null;
@@ -69,7 +68,6 @@ module.exports = function(grunt) {
     this.options.extensions.forEach(function(fn) {
       Twig.extend(fn);
     });
-    Twig.cache(this.options.cache);
   }
 
   GruntTwigRender.prototype.render = function(data, dataPath, template, dest, flatten) {
@@ -78,6 +76,15 @@ module.exports = function(grunt) {
     var replacer = function(match, filename, extension) {
       return filename+"_"+i+extension;
     };
+    var config = {
+      path: template,
+      async: false
+    }
+
+    // adds the newspaces into Twig
+    if (typeof this.options.namespaces != 'undefined') {
+      config.namespaces = this.options.namespaces;
+    }
 
     if(actualData) {
       if(isArray(actualData.dataPath)) {
@@ -94,8 +101,8 @@ module.exports = function(grunt) {
             }
           }
         }
-        for (i = 0, len = pathArray.length; i < len; i++) { 
-          var tt = Twig.twig({path: template, async: false});
+        for (i = 0, len = pathArray.length; i < len; i++) {
+          var tt = Twig.twig(config);
           // compute destination path by inserting '_n'
           var destPath = dest.replace(/(.*)(\.[^\.]+)$/, replacer);
           actualData.dataPath = pathArray[i];
@@ -103,10 +110,7 @@ module.exports = function(grunt) {
         }
         actualData.dataPath = pathArray;
       } else {
-        var twigTemplate = Twig.twig({
-          path: template,
-          async: false
-        });
+        var twigTemplate = Twig.twig(config);
         grunt.file.write(dest, twigTemplate.render(actualData));
       }
     }
@@ -124,7 +128,7 @@ module.exports = function(grunt) {
     var rawData = null;
     if (!rawData && datatype === "string") {
       rawData = this._getDataFromFile(data);
-    } 
+    }
     if (!rawData && Array.isArray(data)) {
       var mergedData = {};
       data.forEach(function(item) {
